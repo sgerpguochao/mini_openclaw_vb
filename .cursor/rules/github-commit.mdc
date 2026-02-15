@@ -1,0 +1,118 @@
+---
+description: "GitHub 提交规范与工作流"
+alwaysApply: true
+---
+
+# GitHub 提交规范与工作流
+
+## 仓库配置
+
+- **仓库**: https://github.com/sgerpguochao/mini_openclaw_vb.git
+- **用户名**: sgerpguochao
+
+## ⚠️ 安全注意
+
+**不要将 GitHub Token 提交到代码库中！**
+
+Token 应该是环境变量或本地配置，不应该出现在任何代码文件中。
+
+## 提交命令
+
+### 使用 committer 脚本（推荐）
+
+```bash
+# 提交所有更改
+git add .
+git commit -m "feat: 添加新功能"
+
+# 或者使用项目提供的 committer 脚本
+scripts/committer "<提交消息>" <文件...>
+```
+
+### 手动提交
+
+```bash
+# 添加文件
+git add <file>
+
+# 提交
+git commit -m "< Conventional Commit 格式的消息>"
+
+# 推送到远程
+git push
+```
+
+## Conventional Commit 规范
+
+提交消息格式：
+
+```
+<type>(<scope>): <description>
+
+[optional body]
+
+[optional footer]
+```
+
+### Type 类型
+
+| 类型 | 说明 |
+|------|------|
+| feat | 新功能 |
+| fix | Bug 修复 |
+| docs | 文档更新 |
+| style | 代码格式 |
+| refactor | 重构 |
+| test | 测试 |
+| chore | 维护任务 |
+
+### 示例
+
+```bash
+git commit -m "feat(gateway): 添加新的模型支持"
+git commit -m "fix(agent): 修复会话超时问题"
+git commit -m "docs: 更新 API 文档"
+```
+
+## Git 配置
+
+### 设置用户信息（如果未设置）
+
+```bash
+git config --global user.name "Your Name"
+git config --global user.email "your.email@example.com"
+```
+
+### 推送到远程
+
+```bash
+git push origin main
+```
+
+## 分支管理
+
+- **主分支**: main
+- **功能分支**: feature/xxx
+- **修复分支**: fix/xxx
+
+## 提交前检查
+
+1. 运行测试: `pnpm test`
+2. 代码检查: `pnpm check`
+3. 构建: `pnpm build`
+
+## Token 配置（本地环境变量）
+
+如需通过 CLI 使用 GitHub，可设置环境变量：
+
+```bash
+# 在 ~/.bashrc 或 ~/.zshrc 中
+export GITHUB_TOKEN="your_token_here"
+```
+
+或使用 Git credential helper：
+
+```bash
+git config --global credential.helper store
+git push https://sgerpguochao@github.com/mini_openclaw_vb.git
+```
