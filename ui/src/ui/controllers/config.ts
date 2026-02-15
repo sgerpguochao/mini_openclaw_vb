@@ -34,6 +34,7 @@ export type ConfigState = {
   configActiveSection: string | null;
   configActiveSubsection: string | null;
   lastError: string | null;
+  modelsValidating?: boolean;
 };
 
 export async function loadConfig(state: ConfigState) {
@@ -215,5 +216,38 @@ export function removeConfigFormValue(state: ConfigState, path: Array<string | n
   state.configFormDirty = true;
   if (state.configFormMode === "form") {
     state.configRaw = serializeConfigForm(base);
+  }
+}
+
+/**
+ * Patch config with a partial object (merge). Used for targeted updates like
+ * models.providers without loading the full form.
+ */
+export async function patchConfig(
+  state: ConfigState,
+  partial: Record<string, unknown>,
+): Promise<boolean> {
+  if (!state.client || !state.connected) {
+    return false;
+  }
+  const baseHash = state.configSnapshot?.hash;
+  if (!baseHash) {
+    state.lastError = "Config hash missing; reload and retry.";
+    return false;
+  }
+  state.configSaving = true;
+  state.lastError = null;
+  try {
+    await state.client.request("config.patch", {
+      raw: JSON.stringify(partial),
+      baseHash,
+    });
+    await loadConfig(state);
+    return true;
+  } catch (err) {
+    state.lastError = String(err);
+    return false;
+  } finally {
+    state.configSaving = false;
   }
 }

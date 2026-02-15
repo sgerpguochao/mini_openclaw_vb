@@ -139,6 +139,7 @@ function authorizeGatewayMethod(method: string, client: GatewayRequestOptions["c
     return errorShape(ErrorCodes.INVALID_REQUEST, "missing scope: operator.admin");
   }
   if (
+    method === "models.validate" ||
     method.startsWith("config.") ||
     method.startsWith("wizard.") ||
     method.startsWith("update.") ||

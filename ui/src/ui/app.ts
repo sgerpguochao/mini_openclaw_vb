@@ -167,6 +167,7 @@ export class OpenClawApp extends LitElement {
   @state() configValid: boolean | null = null;
   @state() configIssues: unknown[] = [];
   @state() configSaving = false;
+  @state() modelsValidating = false;
   @state() configApplying = false;
   @state() updateRunning = false;
   @state() applySessionKey = this.settings.lastActiveSessionKey;
@@ -182,6 +183,7 @@ export class OpenClawApp extends LitElement {
   @state() configSearchQuery = "";
   @state() configActiveSection: string | null = null;
   @state() configActiveSubsection: string | null = null;
+  @state() modelsEditingProviderId: string | null = null;
 
   @state() channelsLoading = false;
   @state() channelsSnapshot: ChannelsStatusSnapshot | null = null;

@@ -1,0 +1,99 @@
+---
+description: "OpenClaw 项目架构与前后端启动命令"
+alwaysApply: false
+---
+# OpenClaw 项目架构与启动
+
+## 架构
+
+- **后端**：Gateway（Node.js + TypeScript），`src/` + `dist/`，提供 WebSocket 与 HTTP
+- **前端**：Control UI（`ui/`），构建产物在 `dist/control-ui`，由 Gateway 同端口提供
+- **运行方式**：单进程，Gateway 同时托管后端与前端，监听 0.0.0.0:18789
+- **环境**：Node ≥22，pnpm
+
+## 终端启动命令
+
+```bash
+# 启动（后台，日志写入 logs_/）
+./start.sh
+
+# 停止
+./stop.sh
+
+# 备选：前台运行
+pnpm openclaw gateway run --bind lan --port 18789
+```
+
+**日志目录：** `logs_/`
+
+## 配置（~/.openclaw/openclaw.json）
+
+外网访问需配置：
+
+```json
+{
+  "gateway": {
+    "mode": "local",
+    "bind": "lan",
+    "port": 18789,
+    "auth": {
+      "mode": "token",
+      "token": "dev-token-123456"
+    },
+    "controlUi": {
+      "allowInsecureAuth": true
+    }
+  },
+  "agents": { ... }
+}
+```
+
+- `bind: "lan"`：监听 0.0.0.0，允许外网访问
+- `auth.token`：Gateway 认证 token
+- `controlUi.allowInsecureAuth: true`：HTTP 下允许仅 token 认证（外网访问必需）
+- 修改配置后需执行 `./stop.sh` 再 `./start.sh` 重启
+
+## 外网远程访问
+
+**WebSocket URL：** `ws://<公网IP>:18789`（如 `ws://117.50.80.70:18789`）
+
+**Gateway Token：** `dev-token-123456`
+
+在 Control UI Overview 中填入上述 URL 和 Token，点击 Connect。
+或直接访问：`http://<公网IP>:18789/?token=dev-token-123456`
+
+## 模型与 API Key 配置（对话问答）
+
+**方式一：向导（推荐）**
+```bash
+openclaw onboard
+```
+按提示选择提供商（如 Anthropic、OpenAI），粘贴 API Key 或执行 OAuth。
+
+**方式二：环境变量**
+在 `~/.openclaw/.env` 或 `openclaw.json` 的 `env` 块中设置：
+- Anthropic：`ANTHROPIC_API_KEY`
+- OpenAI：`OPENAI_API_KEY`
+- OpenRouter：`OPENROUTER_API_KEY`
+- 其他：见 `/docs/providers/index`
+
+**方式三：openclaw.json 内联**
+```json
+{
+  "env": {
+    "ANTHROPIC_API_KEY": "sk-ant-...",
+    "OPENAI_API_KEY": "sk-..."
+  },
+  "agents": {
+    "defaults": {
+      "model": { "primary": "anthropic/claude-sonnet-4-5" }
+    }
+  }
+}
+```
+
+**设置默认模型：**
+```bash
+openclaw models set anthropic/claude-sonnet-4-5
+openclaw models status   # 校验认证与模型
+```

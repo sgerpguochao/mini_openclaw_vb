@@ -62,6 +62,12 @@ const debouncedLoadUsage = (state: UsageState) => {
   }
   usageDateDebounceTimeout = window.setTimeout(() => void loadUsage(state), 400);
 };
+import {
+  addModelsProvider,
+  deleteModelsProvider,
+  setDefaultModelProvider,
+  updateModelsProvider,
+} from "./controllers/models.ts";
 import { renderAgents } from "./views/agents.ts";
 import { renderChannels } from "./views/channels.ts";
 import { renderChat } from "./views/chat.ts";
@@ -72,6 +78,7 @@ import { renderExecApprovalPrompt } from "./views/exec-approval.ts";
 import { renderGatewayUrlConfirmation } from "./views/gateway-url-confirmation.ts";
 import { renderInstances } from "./views/instances.ts";
 import { renderLogs } from "./views/logs.ts";
+import { renderModels } from "./views/models.ts";
 import { renderNodes } from "./views/nodes.ts";
 import { renderOverview } from "./views/overview.ts";
 import { renderSessions } from "./views/sessions.ts";
@@ -1127,6 +1134,41 @@ export function renderApp(state: AppViewState) {
                 onSplitRatioChange: (ratio: number) => state.handleSplitRatioChange(ratio),
                 assistantName: state.assistantName,
                 assistantAvatar: state.assistantAvatar,
+              })
+            : nothing
+        }
+
+        ${
+          state.tab === "models"
+            ? renderModels({
+                connected: state.connected,
+                configLoading: state.configLoading,
+                configSaving: state.configSaving,
+                modelsValidating: state.modelsValidating ?? false,
+                configSnapshot: state.configSnapshot,
+                lastError: state.lastError,
+                editingProviderId: state.modelsEditingProviderId,
+                onReload: () => loadConfig(state),
+                onAddProvider: async (params) => {
+                  await addModelsProvider(state, params);
+                },
+                onUpdateProvider: async (providerId, params) => {
+                  await updateModelsProvider(state, providerId, params);
+                  state.modelsEditingProviderId = null;
+                },
+                onDeleteProvider: async (providerId) => {
+                  await deleteModelsProvider(state, providerId);
+                  state.modelsEditingProviderId = null;
+                },
+                onSetDefaultModel: async (providerId, modelId) => {
+                  await setDefaultModelProvider(state, providerId, modelId);
+                },
+                onStartEditProvider: (providerId) => {
+                  state.modelsEditingProviderId = providerId;
+                },
+                onCancelEditProvider: () => {
+                  state.modelsEditingProviderId = null;
+                },
               })
             : nothing
         }

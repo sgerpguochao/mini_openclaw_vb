@@ -73,6 +73,11 @@ export async function sendChatMessage(
   }
 
   const now = Date.now();
+  const isResetCommand =
+    msg.toLowerCase() === "/new" ||
+    msg.toLowerCase() === "/reset" ||
+    msg.toLowerCase().startsWith("/new ") ||
+    msg.toLowerCase().startsWith("/reset ");
 
   // Build user message content blocks
   const contentBlocks: Array<{ type: string; text?: string; source?: unknown }> = [];
@@ -89,14 +94,23 @@ export async function sendChatMessage(
     }
   }
 
-  state.chatMessages = [
-    ...state.chatMessages,
-    {
-      role: "user",
-      content: contentBlocks,
-      timestamp: now,
-    },
-  ];
+  // For /new or /reset, replace history with just this message (session is about to be reset)
+  state.chatMessages = isResetCommand
+    ? [
+        {
+          role: "user",
+          content: contentBlocks,
+          timestamp: now,
+        },
+      ]
+    : [
+        ...state.chatMessages,
+        {
+          role: "user",
+          content: contentBlocks,
+          timestamp: now,
+        },
+      ];
 
   state.chatSending = true;
   state.lastError = null;
@@ -123,6 +137,9 @@ export async function sendChatMessage(
     : undefined;
 
   try {
+    if (isResetCommand) {
+      await state.client.request("sessions.reset", { key: state.sessionKey });
+    }
     await state.client.request("chat.send", {
       sessionKey: state.sessionKey,
       message: msg,

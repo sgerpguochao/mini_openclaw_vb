@@ -173,6 +173,22 @@ export const ModelsListResultSchema = Type.Object(
   { additionalProperties: false },
 );
 
+export const ModelsValidateParamsSchema = Type.Object(
+  {
+    baseUrl: NonEmptyString,
+    modelId: NonEmptyString,
+    apiKey: Type.Optional(Type.String()),
+  },
+  { additionalProperties: false },
+);
+
+export const ModelsValidateResultSchema = Type.Object(
+  {
+    ok: Type.Literal(true),
+  },
+  { additionalProperties: false },
+);
+
 export const SkillsStatusParamsSchema = Type.Object(
   {
     agentId: Type.Optional(NonEmptyString),

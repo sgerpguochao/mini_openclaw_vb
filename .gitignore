@@ -67,6 +67,9 @@ apps/ios/*.dSYM.zip
 # provisioning profiles (local)
 apps/ios/*.mobileprovision
 
+# Local gateway logs (start.sh)
+logs_/
+
 # Local untracked files
 .local/
 docs/.local/

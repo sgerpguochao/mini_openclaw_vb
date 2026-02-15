@@ -94,6 +94,7 @@ export type AppViewState = {
   configValid: boolean | null;
   configIssues: unknown[];
   configSaving: boolean;
+  modelsValidating: boolean;
   configApplying: boolean;
   updateRunning: boolean;
   applySessionKey: string;
@@ -108,6 +109,7 @@ export type AppViewState = {
   configSearchQuery: string;
   configActiveSection: string | null;
   configActiveSubsection: string | null;
+  modelsEditingProviderId: string | null;
   channelsLoading: boolean;
   channelsSnapshot: ChannelsStatusSnapshot | null;
   channelsError: string | null;
